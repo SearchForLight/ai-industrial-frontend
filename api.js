@@ -1,4 +1,4 @@
-const API_BASE = 'http://ai-industrial-backend-auth-production.up.railway.app';
+const API_BASE = 'https://ai-industrial-backend-auth-production.up.railway.app';
 
 // 注册
 async function apiRegister(username, password, role, adminSecret) {
