@@ -1,0 +1,1 @@
+# ai-industrial-frontend
