@@ -42,9 +42,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3" id="adminPasswordDiv" style="display:none;" hidden>
+                            <div class="mb-3" id="adminPasswordDiv" style="display:none;">
                                 <label class="form-label">管理员专用密码</label>
-                                <input type="password" id="adminPassword" class="form-control" placeholder="请输入1227">
+                                <input type="password" id="adminPassword" class="form-control" placeholder="请输入管理员专用密码">
                             </div>
                             <button type="submit" class="btn btn-success w-100">注册并登录</button>
                         </form>
@@ -57,7 +57,12 @@
 
     <script src="api.js"></script>
     <script>
-        document.getElementById('adminPasswordDiv').style.display = 'none';
+        document.querySelectorAll('input[name="role"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('adminPasswordDiv').style.display =
+                    this.value === 'admin' ? 'block' : 'none';
+            });
+        });
 
         document.getElementById('toggleRegPassword').addEventListener('click', function () {
             const input = document.getElementById('regPassword');
@@ -69,7 +74,7 @@
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const role = document.querySelector('input[name="role"]:checked').value;
-            const adminPass = role === 'admin' ? '1227' : '';
+            const adminPass = document.getElementById('adminPassword').value;
             const username = document.getElementById('regUsername').value.trim();
             const password = document.getElementById('regPassword').value;
 
