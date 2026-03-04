@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>登录 - 远程工业运维平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="text-center mb-4">登录平台</h2>
+
+                        <!-- 已注册账号列表（一键切换） -->
+                        <div id="accountList" class="mb-4"></div>
+
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label class="form-label">用户名</label>
+                                <input type="text" id="username" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">密码</label>
+                                <input type="password" id="password" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">登录</button>
+                        </form>
+                        <p class="text-center mt-3">没有账号？<a href="register.html">立即注册</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 先引入 api.js，再写本页逻辑 -->
+    <script src="api.js"></script>
+    <script>
+        // 显示已注册账号列表（支持一键切换）
+        function renderAccountList() {
+            const users = (function() {
+                try {
+                    return JSON.parse(localStorage.getItem('users')) || [];
+                } catch (e) {
+                    return [];
+                }
+            })();
+
+            if (!users.length) {
+                document.getElementById('accountList').innerHTML =
+                    '<p class="text-muted">暂无账号，请先注册。</p>';
+                return;
+            }
+
+            let html = '<p class="mb-2 text-muted">已注册账号（点击快速登录）</p><div class="list-group">';
+            users.forEach(user => {
+                html += `<button type="button" class="list-group-item list-group-item-action"
+                            onclick="quickLogin('${user.username}')">
+                            ${user.username} (${user.role})
+                         </button>`;
+            });
+            html += '</div>';
+            document.getElementById('accountList').innerHTML = html;
+        }
+
+        async function quickLogin(username) {
+            // 通过本地 users 找到密码，然后调用 apiLogin（真实项目建议直接让后端提供一键切换接口）
+            const users = (function() {
+                try {
+                    return JSON.parse(localStorage.getItem('users')) || [];
+                } catch (e) {
+                    return [];
+                }
+            })();
+
+            const user = users.find(u => u.username === username);
+            if (!user) {
+                alert('未找到该用户，请重新登录');
+                return;
+            }
+            try {
+                await apiLogin(user.username, user.password);
+                alert(`已切换到 ${username}`);
+                window.location.href = 'main.html';
+            } catch (err) {
+                alert(err.message || '快速登录失败');
+            }
+        }
+
+        // 普通登录
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            try {
+                await apiLogin(username, password);
+                alert('登录成功！');
+                window.location.href = 'main.html';
+            } catch (err) {
+                alert(err.message || '登录失败');
+            }
+        });
+
+        // 页面加载时显示账号列表
+        renderAccountList();
+    </script>
+</body>
+</html>
