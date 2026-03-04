@@ -160,24 +160,28 @@
     <script>
         // 初始化当前用户和角色对应的界面
         (async function initPage() {
-            const currentUser = await apiGetCurrentUser();
-            if (!currentUser || !currentUser.username) {
+            try {
+                const currentUser = await apiGetCurrentUser();
+                if (!currentUser || !currentUser.username) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const { username, role } = currentUser;
+                document.getElementById('welcome').textContent = `欢迎，${username}（${role}）`;
+
+                if (role === 'user') {
+                    document.getElementById('userSection').style.display = 'block';
+                } else if (role === 'expert' || role === 'admin') {
+                    document.getElementById('recordsSection').style.display = 'block';
+                    loadRecords();
+                }
+                if (role === 'admin') {
+                    document.getElementById('adminSection').style.display = 'block';
+                    loadUsers();
+                }
+            } catch {
                 window.location.href = 'index.html';
-                return;
-            }
-
-            const { username, role } = currentUser;
-            document.getElementById('welcome').textContent = `欢迎，${username}（${role}）`;
-
-            if (role === 'user') {
-                document.getElementById('userSection').style.display = 'block';
-            } else if (role === 'expert' || role === 'admin') {
-                document.getElementById('recordsSection').style.display = 'block';
-                loadRecords();
-            }
-            if (role === 'admin') {
-                document.getElementById('adminSection').style.display = 'block';
-                loadUsers();
             }
         })();
 
@@ -281,7 +285,7 @@
                                 <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>管理员</option>
                             </select>
                         </td>
-                        <td>${u.createdAt ? new Date(u.createdAt).toLocaleString() : '-'}</td>
+                        <td>${u.created_at ? new Date(u.created_at).toLocaleString() : '-'}</td>
                         <td>
                             <button class="btn btn-sm btn-outline-primary me-2 btn-save-role">保存</button>
                             <button class="btn btn-sm btn-outline-danger btn-delete-user">删除</button>

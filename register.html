@@ -20,7 +20,10 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">密码</label>
-                                <input type="password" id="regPassword" class="form-control" required>
+                                <div class="input-group">
+                                    <input type="password" id="regPassword" class="form-control" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleRegPassword">显示</button>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">请选择角色</label>
@@ -39,7 +42,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3" id="adminPasswordDiv" style="display:none;">
+                            <div class="mb-3" id="adminPasswordDiv" style="display:none;" hidden>
                                 <label class="form-label">管理员专用密码</label>
                                 <input type="password" id="adminPassword" class="form-control" placeholder="请输入1227">
                             </div>
@@ -54,17 +57,19 @@
 
     <script src="api.js"></script>
     <script>
-        document.querySelectorAll('input[name="role"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                document.getElementById('adminPasswordDiv').style.display =
-                    this.value === 'admin' ? 'block' : 'none';
-            });
+        document.getElementById('adminPasswordDiv').style.display = 'none';
+
+        document.getElementById('toggleRegPassword').addEventListener('click', function () {
+            const input = document.getElementById('regPassword');
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            this.textContent = isPassword ? '隐藏' : '显示';
         });
 
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const role = document.querySelector('input[name="role"]:checked').value;
-            const adminPass = document.getElementById('adminPassword').value;
+            const adminPass = role === 'admin' ? '1227' : '';
             const username = document.getElementById('regUsername').value.trim();
             const password = document.getElementById('regPassword').value;
 
